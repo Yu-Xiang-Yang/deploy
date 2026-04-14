@@ -52,7 +52,8 @@ Write-Host ""
 Write-Host "=== 上传应用文件 ===" -ForegroundColor Cyan
 Get-ChildItem -Path $AppDir -File | ForEach-Object {
     Write-Host "  上传: $($_.Name)"
-    adb push $_.FullName "${RemoteAppDir}/$($_.Name)"
+    $remotePath = "$RemoteAppDir/$($_.Name)"
+    adb push $_.FullName $remotePath
 }
 
 # 上传并安装离线依赖包
@@ -64,7 +65,8 @@ if ((Test-Path $PackagesDir) -and (Get-ChildItem -Path $PackagesDir -Filter "*.w
     adb shell "mkdir -p $RemotePkgDir"
     Get-ChildItem -Path $PackagesDir -Filter "*.whl" | ForEach-Object {
         Write-Host "  上传: $($_.Name)"
-        adb push $_.FullName "${RemotePkgDir}/$($_.Name)"
+        $remotePkgPath = "$RemotePkgDir/$($_.Name)"
+        adb push $_.FullName $remotePkgPath
     }
     Write-Host "  安装依赖包..."
     adb shell "pip3 install --no-deps ${RemotePkgDir}/*.whl"

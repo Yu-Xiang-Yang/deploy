@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# RK3588 app auto-start service
+#
+
+DAEMON=/usr/bin/python3
+SCRIPT=/data/rk3588app/main.py
+LOGFILE=/data/rk3588app/app.log
+PIDFILE=/var/run/rk3588app.pid
+
+case "$1" in
+  start)
+    printf "Starting rk3588app: "
+    sleep 3
+    start-stop-daemon -S -b -m -p $PIDFILE \
+      --exec /bin/sh -- -c "exec $DAEMON $SCRIPT >> $LOGFILE 2>&1"
+    echo "OK"
+    ;;
+  stop)
+    printf "Stopping rk3588app: "
+    start-stop-daemon -K -p $PIDFILE
+    rm -f $PIDFILE
+    echo "OK"
+    ;;
+  restart)
+    $0 stop
+    sleep 1
+    $0 start
+    ;;
+  status)
+    if [ -f $PIDFILE ] && kill -0 $(cat $PIDFILE) 2>/dev/null; then
+      echo "rk3588app is running (PID: $(cat $PIDFILE))"
+    else
+      echo "rk3588app is not running"
+    fi
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+    ;;
+esac
+
+exit 0

@@ -12,7 +12,8 @@
 ├── S99rk3588app       # init.d 自启动服务脚本
 ├── README.md
 └── app/
-    └── main.py        # 应用程序（替换为你自己的）
+    ├── main.py        # 应用程序（替换为你自己的）
+    └── packages/      # 离线 .whl 依赖包（可选）
 ```
 
 ## 前提条件
@@ -70,8 +71,9 @@ bash deploy.sh
 1. 检查 ADB 连接
 2. 停止旧服务
 3. 上传 `app/` 下所有文件到设备 `/data/rk3588app/`
-4. 安装自启动脚本到 `/etc/init.d/S99rk3588app`
-5. 启动服务并验证
+4. 安装离线依赖包（如果 `app/packages/` 下有 `.whl` 文件）
+5. 安装自启动脚本到 `/etc/init.d/S99rk3588app`
+6. 启动服务并验证
 
 ### 4. 验证
 
@@ -82,6 +84,28 @@ adb shell /etc/init.d/S99rk3588app status
 # 查看日志
 adb shell cat /data/rk3588app/app.log
 ```
+
+## 离线安装 Python 依赖
+
+RK3588 设备通常无法联网，需要在电脑上提前下载 `.whl` 文件，放到 `app/packages/` 目录下，部署时会自动上传并安装。
+
+### 下载 .whl 文件
+
+在联网的电脑上，针对 RK3588 的架构（aarch64 + Linux）下载：
+
+```bash
+pip download <包名> --platform linux_aarch64 --python-version 310 --only-binary=:all: -d app/packages/
+```
+
+例如下载 `requests`：
+
+```bash
+pip download requests --platform linux_aarch64 --python-version 310 --only-binary=:all: -d app/packages/
+```
+
+> **提示：** 如果 `pip download` 找不到对应平台的包，可以直接从 [PyPI](https://pypi.org) 手动下载对应 `cp310-linux_aarch64` 的 `.whl` 文件放入 `app/packages/`。
+
+部署脚本会自动检测 `app/packages/` 目录，有 `.whl` 文件就会上传并安装，没有则跳过。
 
 ## 常用命令
 

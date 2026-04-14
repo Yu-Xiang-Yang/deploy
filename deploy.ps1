@@ -55,6 +55,22 @@ Get-ChildItem -Path $AppDir -File | ForEach-Object {
     adb push $_.FullName "${RemoteAppDir}/$($_.Name)"
 }
 
+# 上传并安装离线依赖包
+$PackagesDir = Join-Path $AppDir "packages"
+if ((Test-Path $PackagesDir) -and (Get-ChildItem -Path $PackagesDir -Filter "*.whl" -ErrorAction SilentlyContinue)) {
+    Write-Host ""
+    Write-Host "=== 安装离线依赖 ===" -ForegroundColor Cyan
+    $RemotePkgDir = "$RemoteAppDir/packages"
+    adb shell "mkdir -p $RemotePkgDir"
+    Get-ChildItem -Path $PackagesDir -Filter "*.whl" | ForEach-Object {
+        Write-Host "  上传: $($_.Name)"
+        adb push $_.FullName "${RemotePkgDir}/$($_.Name)"
+    }
+    Write-Host "  安装依赖包..."
+    adb shell "pip3 install --no-deps ${RemotePkgDir}/*.whl"
+    Write-Host "  依赖安装完成"
+}
+
 # 上传自启动脚本
 Write-Host ""
 Write-Host "=== 配置自启动服务 ===" -ForegroundColor Cyan

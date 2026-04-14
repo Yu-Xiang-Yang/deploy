@@ -58,6 +58,24 @@ for file in "$APP_DIR"/*; do
     fi
 done
 
+# 上传并安装离线依赖包
+PACKAGES_DIR="$APP_DIR/packages"
+if [ -d "$PACKAGES_DIR" ] && ls "$PACKAGES_DIR"/*.whl 1>/dev/null 2>&1; then
+    echo ""
+    echo "=== 安装离线依赖 ==="
+    REMOTE_PKG_DIR="$REMOTE_APP_DIR/packages"
+    MSYS_NO_PATHCONV=1 adb shell "mkdir -p $REMOTE_PKG_DIR"
+    for whl in "$PACKAGES_DIR"/*.whl; do
+        whlname=$(basename "$whl")
+        echo "  上传: $whlname"
+        win_whl=$(cygpath -w "$whl" 2>/dev/null || echo "$whl")
+        MSYS_NO_PATHCONV=1 adb push "$win_whl" "$REMOTE_PKG_DIR/$whlname"
+    done
+    echo "  安装依赖包..."
+    MSYS_NO_PATHCONV=1 adb shell "pip3 install --no-deps $REMOTE_PKG_DIR/*.whl"
+    echo "  依赖安装完成"
+fi
+
 # 上传自启动脚本
 echo ""
 echo "=== 配置自启动服务 ==="

@@ -7,13 +7,16 @@
 ## 项目结构
 
 ```
-├── deploy.sh          # 一键部署脚本（Git Bash）
-├── deploy.ps1         # 一键部署脚本（PowerShell）
-├── S99rk3588app       # init.d 自启动服务脚本
+├── deploy.sh               # 一键部署脚本（Git Bash）
+├── deploy.ps1              # 一键部署脚本（PowerShell）
+├── download_packages.sh    # 自动下载离线依赖（Git Bash）
+├── download_packages.ps1   # 自动下载离线依赖（PowerShell）
+├── S99rk3588app            # init.d 自启动服务脚本
 ├── README.md
 └── app/
-    ├── main.py        # 应用程序（替换为你自己的）
-    └── packages/      # 离线 .whl 依赖包（可选）
+    ├── main.py             # 应用程序（替换为你自己的）
+    ├── requirements.txt    # Python 依赖列表（可选）
+    └── packages/           # 离线 .whl 依赖包（自动下载）
 ```
 
 ## 前提条件
@@ -89,18 +92,35 @@ adb shell cat /data/rk3588app/app.log
 
 RK3588 设备通常无法联网，需要在电脑上提前下载 `.whl` 文件，放到 `app/packages/` 目录下，部署时会自动上传并安装。
 
-### 下载 .whl 文件
+### 自动下载（推荐）
 
-在联网的电脑上，针对 RK3588 的架构（aarch64 + Linux）下载：
+1. 在 `app/` 下创建 `requirements.txt`，写入依赖：
+
+```
+requests
+numpy==1.26.4
+```
+
+2. 运行下载脚本，自动下载对应 RK3588 架构（aarch64 + Python 3.10）的 `.whl` 文件：
+
+**PowerShell：**
+```powershell
+.\download_packages.ps1
+```
+
+**Git Bash：**
+```bash
+bash download_packages.sh
+```
+
+3. 运行 `.\deploy.ps1` 或 `bash deploy.sh` 部署，依赖会自动上传并安装到设备。
+
+### 手动下载
+
+也可以手动下载 `.whl` 文件放入 `app/packages/`：
 
 ```bash
 pip download <包名> --platform linux_aarch64 --python-version 310 --only-binary=:all: -d app/packages/
-```
-
-例如下载 `requests`：
-
-```bash
-pip download requests --platform linux_aarch64 --python-version 310 --only-binary=:all: -d app/packages/
 ```
 
 > **提示：** 如果 `pip download` 找不到对应平台的包，可以直接从 [PyPI](https://pypi.org) 手动下载对应 `cp310-linux_aarch64` 的 `.whl` 文件放入 `app/packages/`。

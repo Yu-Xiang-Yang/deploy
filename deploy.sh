@@ -8,6 +8,9 @@
 
 set -e
 
+# Windows Git Bash 下禁止路径自动转换，避免 adb 远程路径被篡改
+export MSYS_NO_PATHCONV=1
+
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 APP_DIR="${1:-$SCRIPT_DIR/app}"
 REMOTE_APP_DIR="/data/rk3588app"
@@ -50,14 +53,16 @@ for file in "$APP_DIR"/*; do
     if [ -f "$file" ]; then
         filename=$(basename "$file")
         echo "  上传: $filename"
-        MSYS_NO_PATHCONV=1 adb push "$file" "$REMOTE_APP_DIR/$filename"
+        win_file=$(cygpath -w "$file" 2>/dev/null || echo "$file")
+        MSYS_NO_PATHCONV=1 adb push "$win_file" "$REMOTE_APP_DIR/$filename"
     fi
 done
 
 # 上传自启动脚本
 echo ""
 echo "=== 配置自启动服务 ==="
-MSYS_NO_PATHCONV=1 adb push "$SCRIPT_DIR/$SERVICE_NAME" "$REMOTE_INIT_DIR/$SERVICE_NAME"
+win_service=$(cygpath -w "$SCRIPT_DIR/$SERVICE_NAME" 2>/dev/null || echo "$SCRIPT_DIR/$SERVICE_NAME")
+MSYS_NO_PATHCONV=1 adb push "$win_service" "$REMOTE_INIT_DIR/$SERVICE_NAME"
 MSYS_NO_PATHCONV=1 adb shell "chmod 755 $REMOTE_INIT_DIR/$SERVICE_NAME"
 echo "自启动脚本已安装"
 

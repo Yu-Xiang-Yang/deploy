@@ -75,7 +75,8 @@ if ((Test-Path $PackagesDir) -and (Get-ChildItem -Path $PackagesDir -Filter "*.w
 Write-Host ""
 Write-Host "=== 配置自启动服务 ===" -ForegroundColor Cyan
 $servicePath = Join-Path $ScriptDir $ServiceName
-adb push $servicePath "${RemoteInitDir}/${ServiceName}"
+$remoteServicePath = "$RemoteInitDir/$ServiceName"
+adb push $servicePath $remoteServicePath
 adb shell "chmod 755 $RemoteInitDir/$ServiceName"
 Write-Host "自启动脚本已安装"
 

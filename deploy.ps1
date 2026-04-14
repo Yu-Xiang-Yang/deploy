@@ -1,4 +1,4 @@
-#
+﻿#
 # 一键部署脚本（PowerShell 版）：将应用部署到 RK3588 并配置自启动
 #
 # 用法: .\deploy.ps1 [app_dir]
@@ -19,8 +19,8 @@ $ServiceName = "S99rk3588app"
 
 # 检查 adb 连接
 Write-Host "=== 检查 ADB 连接 ===" -ForegroundColor Cyan
-$devices = adb devices 2>&1
-if ($devices -notmatch "device$") {
+$devices = (adb devices 2>&1) -join "`n"
+if ($devices -notmatch "\tdevice") {
     Write-Host "错误: 未检测到 ADB 设备，请检查连接" -ForegroundColor Red
     exit 1
 }

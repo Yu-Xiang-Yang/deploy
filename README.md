@@ -7,8 +7,8 @@
 ## 项目结构
 
 ```
-deploy/
-├── deploy.sh          # 一键部署脚本
+├── deploy.sh          # 一键部署脚本（Git Bash）
+├── deploy.ps1         # 一键部署脚本（PowerShell）
 ├── S99rk3588app       # init.d 自启动服务脚本
 ├── README.md
 └── app/
@@ -19,7 +19,7 @@ deploy/
 
 - RK3588 设备已通过 USB 连接，`adb devices` 可识别
 - 设备上已安装 Python3（`/usr/bin/python3`）
-- 主机环境为 Windows（Git Bash）或 Linux/macOS
+- 主机环境为 Windows（PowerShell / Git Bash）或 Linux/macOS
 
 ## 快速开始
 
@@ -47,6 +47,19 @@ while True:
 > **注意：** `print` 需要加 `flush=True`，否则后台运行时日志不会实时写入。
 
 ### 3. 部署
+
+**PowerShell（推荐）：**
+
+```powershell
+.\deploy.ps1
+```
+
+> 如果提示脚本执行策略限制，先运行一次：
+> ```powershell
+> Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+> ```
+
+**Git Bash：**
 
 ```bash
 bash deploy.sh
@@ -83,7 +96,7 @@ adb shell cat /data/rk3588app/app.log
 
 ## 自定义配置
 
-如需修改部署路径或服务名，编辑 `deploy.sh` 顶部的变量：
+如需修改部署路径或服务名，编辑 `deploy.sh`（或 `deploy.ps1`）顶部的变量：
 
 ```bash
 REMOTE_APP_DIR="/data/rk3588app"      # 设备上的应用目录

@@ -1,8 +1,8 @@
 numpy==1.26.4
 opencv-python-headless==4.9.0.80
 protobuf==3.18.0
-psutil==5.8.0
+psutil>=5.8.0
 pyserial==3.5
 ruamel.yaml==0.17.31
-ruamel.yaml.clib==0.2.7
+ruamel.yaml.clib>=0.2.7
 six==1.16.0

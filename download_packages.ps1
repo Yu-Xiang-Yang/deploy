@@ -1,4 +1,4 @@
-#
+﻿#
 # 根据 requirements.txt 自动下载 RK3588 离线 .whl 依赖包
 #
 # 用法: .\download_packages.ps1 [requirements_path]
@@ -31,8 +31,14 @@ Write-Host "  目标平台: linux_aarch64 / Python 3.10"
 Write-Host "  下载目录: $PackagesDir"
 Write-Host ""
 
-# 下载 whl 文件
-pip download -r $RequirementsPath --platform linux_aarch64 --python-version 310 --only-binary=:all: -d $PackagesDir
+# 下载 whl 文件（尝试多个平台标签）
+pip download -r $RequirementsPath `
+    --platform manylinux2014_aarch64 `
+    --platform manylinux_2_17_aarch64 `
+    --platform linux_aarch64 `
+    --python-version 310 `
+    --only-binary=:all: `
+    -d $PackagesDir
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host ""

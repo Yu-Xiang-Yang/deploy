@@ -26,8 +26,14 @@ echo "  目标平台: linux_aarch64 / Python 3.10"
 echo "  下载目录: $PACKAGES_DIR"
 echo ""
 
-# 下载 whl 文件
-pip download -r "$REQUIREMENTS" --platform linux_aarch64 --python-version 310 --only-binary=:all: -d "$PACKAGES_DIR"
+# 下载 whl 文件（尝试多个平台标签）
+pip download -r "$REQUIREMENTS" \
+    --platform manylinux2014_aarch64 \
+    --platform manylinux_2_17_aarch64 \
+    --platform linux_aarch64 \
+    --python-version 310 \
+    --only-binary=:all: \
+    -d "$PACKAGES_DIR"
 
 if [ $? -eq 0 ]; then
     echo ""

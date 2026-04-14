@@ -127,6 +127,22 @@ pip download <包名> --platform linux_aarch64 --python-version 310 --only-binar
 
 部署脚本会自动检测 `app/packages/` 目录，有 `.whl` 文件就会上传并安装，没有则跳过。
 
+### 版本兼容性问题
+
+部分旧版本的包可能没有 `aarch64` 预编译文件，下载时会报错：
+
+```
+ERROR: No matching distribution found for psutil==5.8.0
+```
+
+解决方法：在 `requirements.txt` 中将 `==` 改为 `>=`，允许下载更新的兼容版本：
+
+```
+psutil>=5.8.0
+```
+
+一般来说纯 Python 包（如 `pyserial`、`six`）不受平台限制，带 C 扩展的包（如 `numpy`、`psutil`、`ruamel.yaml.clib`）需要注意版本是否提供了 aarch64 的预编译文件。
+
 ## 常用命令
 
 | 操作 | 命令 |
@@ -169,4 +185,24 @@ S99rk3588app     → 你的应用（最后启动）
 
 ## License
 
-MIT
+MIT License
+
+Copyright (c) 2026 Yu-Xiang-Yang
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

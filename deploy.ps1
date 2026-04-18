@@ -47,11 +47,15 @@ Write-Host ""
 Write-Host "=== 创建远程目录 ===" -ForegroundColor Cyan
 adb shell "mkdir -p $RemoteAppDir"
 
-# 上传应用文件
+# 上传应用文件（包含子目录，packages 目录跳过，由离线依赖逻辑单独处理）
 Write-Host ""
 Write-Host "=== 上传应用文件 ===" -ForegroundColor Cyan
-Get-ChildItem -Path $AppDir -File | ForEach-Object {
-    Write-Host "  上传: $($_.Name)"
+Get-ChildItem -Path $AppDir | Where-Object { $_.Name -ne "packages" } | ForEach-Object {
+    if ($_.PSIsContainer) {
+        Write-Host "  上传目录: $($_.Name)/"
+    } else {
+        Write-Host "  上传: $($_.Name)"
+    }
     $remotePath = "$RemoteAppDir/$($_.Name)"
     adb push $_.FullName $remotePath
 }

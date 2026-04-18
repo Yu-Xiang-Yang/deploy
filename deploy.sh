@@ -46,16 +46,20 @@ echo ""
 echo "=== 创建远程目录 ==="
 MSYS_NO_PATHCONV=1 adb shell "mkdir -p $REMOTE_APP_DIR"
 
-# 上传应用文件
+# 上传应用文件（包含子目录，packages 目录跳过，由离线依赖逻辑单独处理）
 echo ""
 echo "=== 上传应用文件 ==="
-for file in "$APP_DIR"/*; do
-    if [ -f "$file" ]; then
-        filename=$(basename "$file")
-        echo "  上传: $filename"
-        win_file=$(cygpath -w "$file" 2>/dev/null || echo "$file")
-        MSYS_NO_PATHCONV=1 adb push "$win_file" "$REMOTE_APP_DIR/$filename"
+for entry in "$APP_DIR"/*; do
+    [ -e "$entry" ] || continue
+    name=$(basename "$entry")
+    [ "$name" = "packages" ] && continue
+    if [ -d "$entry" ]; then
+        echo "  上传目录: $name/"
+    else
+        echo "  上传: $name"
     fi
+    win_entry=$(cygpath -w "$entry" 2>/dev/null || echo "$entry")
+    MSYS_NO_PATHCONV=1 adb push "$win_entry" "$REMOTE_APP_DIR/$name"
 done
 
 # 上传并安装离线依赖包
